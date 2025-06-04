@@ -46,7 +46,7 @@ public class CacheService {
         String minGroupSql = "SELECT group_id FROM " + sqlName + " WHERE is_delete = 0 ORDER BY group_id LIMIT 1";
         minGroupId = sqlUtils.sql(minGroupSql).queryValue();
 
-        System.out.println("cache_minGroupId" + minGroupId + "cache_maxGroupId" + maxGroupId);
+        System.out.println("cache_minGroupId:" + minGroupId + "cache_maxGroupId:" + maxGroupId);
     }
 
     public Integer getRandomId() {
