@@ -9,8 +9,7 @@ import org.noear.solon.core.handle.ModelAndView;
 import org.noear.solon.data.sql.SqlUtils;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class PicController {
@@ -58,12 +57,16 @@ public class PicController {
     @Mapping("/pic/list")
     public Map<String, String> picList() throws SQLException {
         Integer randomGroupId = cacheService.getRandomGroupId();
+        // 先设置会话变量
+        sqlUtils.sql("SET SESSION group_concat_max_len = 1024000;").update();
+        // 再执行查询语句
         String sql = "SELECT pic_name, GROUP_CONCAT(pic_url) as pic_urls " + "FROM " + sqlName + " " + "WHERE is_delete = 0 AND group_id = ? " + "GROUP BY pic_name";
+
+        System.out.println("sql:" + sql);
 
         return sqlUtils.sql(sql)
                 .params(randomGroupId)
                 .queryRow(resultSet -> {
-                    // 直接访问当前行，不需要调用 next()
                     Map<String, String> map = new HashMap<>();
                     map.put(resultSet.getString("pic_name"), "[" + resultSet.getString("pic_urls") + "]");
                     return map;
