@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.utils.RandomUtils;
+import com.example.demo.utils.StrUtils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
@@ -49,9 +50,20 @@ public class PicController {
      */
     @Mapping("/pic/list")
     public String picList() throws SQLException {
-        List<String> valList = sqlUtils.sql("SELECT pic_url FROM cc_pic_all_dev WHERE is_delete = 0 and group_id = " + RandomUtils.randomNumberList()).queryRowList(String.class);
-        return String.format(String.valueOf(valList));
+        List<String> valList = sqlUtils.sql("SELECT pic_url FROM cc_pic_all_dev WHERE is_delete = 0 and group_id = " + RandomUtils.getRandomValue()).queryRowList(String.class);
+        String jsonResponse = String.valueOf(valList);
+        String returnStr = StrUtils.extractPicUrls(jsonResponse);
+        System.out.println("--------------- picList 方法返回的字符串:");
+        System.out.println(returnStr);
+        System.out.println("---------------");
+        return returnStr;
     }
 
+
+    // 在您的一个Controller中 (例如 DemoController.java 或 PicController.java)
+    @Mapping("/showPicList") // 定义访问此页面的路径
+    public ModelAndView showPicListPage() {
+        return new ModelAndView("picList.ftl");
+    }
 
 }
