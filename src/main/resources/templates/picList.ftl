@@ -141,35 +141,14 @@
             }
         }
 
+        // 下载图片的函数
         function downloadImage(url) {
-            // 创建 XMLHttpRequest 对象
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.responseType = 'blob'; // 设置响应类型为 Blob
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const blob = xhr.response;
-                    // 创建下载链接
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = url.split('/').pop(); // 提取文件名（如 image.jpg）
-
-                    // 添加到文档并触发点击
-                    document.body.appendChild(link);
-                    link.click();
-
-                    // 清理临时链接
-                    URL.revokeObjectURL(link.href);
-                    document.body.removeChild(link);
-                }
-            };
-
-            xhr.onerror = function() {
-                console.error('下载图片失败:', xhr.statusText);
-            };
-
-            xhr.send();
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = url.split('/').pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function fetchAndDisplayImages() {
