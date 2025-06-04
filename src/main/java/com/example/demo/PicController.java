@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.utils.RandomUtils;
+import com.example.demo.server.CacheService;
 import com.example.demo.utils.StrUtils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
@@ -18,15 +18,21 @@ public class PicController {
     @Inject
     SqlUtils sqlUtils;
 
+    @Inject("${config.sqlName}")
+    public static String sqlName;
+
+    @Inject
+    CacheService cacheService;
+
     /**
      * 跳转网页
      *
      * @return
      * @throws SQLException
      */
-    @Mapping("/picTo")
+    @Mapping("/showPic")
     public ModelAndView picTo() throws SQLException {
-        String url = sqlUtils.sql("SELECT pic_url FROM cc_pic_all_dev WHERE is_delete = 0 and id = " + RandomUtils.randomNumber()).queryValue();
+        String url = sqlUtils.sql("SELECT pic_url FROM  " + sqlName + "  WHERE is_delete = 0 and id = " + cacheService.getRandomId()).queryValue();
         return new ModelAndView("pic.ftl").put("url", url);
     }
 
@@ -38,7 +44,7 @@ public class PicController {
      */
     @Mapping("/pic")
     public String pic() throws SQLException {
-        String val = sqlUtils.sql("SELECT pic_url FROM cc_pic_all_dev WHERE is_delete = 0 and id = " + RandomUtils.randomNumber()).queryValue();
+        String val = sqlUtils.sql("SELECT pic_url FROM  " + sqlName + "  WHERE is_delete = 0 and id = " + cacheService.getRandomId()).queryValue();
         return String.format(val);
     }
 
@@ -50,17 +56,11 @@ public class PicController {
      */
     @Mapping("/pic/list")
     public String picList() throws SQLException {
-        List<String> valList = sqlUtils.sql("SELECT pic_url FROM cc_pic_all_dev WHERE is_delete = 0 and group_id = " + RandomUtils.getRandomValue()).queryRowList(String.class);
+        List<String> valList = sqlUtils.sql("SELECT pic_url FROM  " + sqlName + "  WHERE is_delete = 0 and group_id = " + cacheService.getRandomGroupId()).queryRowList(String.class);
         String jsonResponse = String.valueOf(valList);
-        String returnStr = StrUtils.extractPicUrls(jsonResponse);
-        System.out.println("--------------- picList 方法返回的字符串:");
-        System.out.println(returnStr);
-        System.out.println("---------------");
-        return returnStr;
+        return StrUtils.extractPicUrls(jsonResponse);
     }
 
-
-    // 在您的一个Controller中 (例如 DemoController.java 或 PicController.java)
     @Mapping("/showPicList") // 定义访问此页面的路径
     public ModelAndView showPicListPage() {
         return new ModelAndView("picList.ftl");
