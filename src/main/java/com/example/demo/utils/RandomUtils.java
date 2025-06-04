@@ -5,7 +5,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RandomUtils {
     public static Integer randomNumber() {
         //获取随机数861736 1702875
-        return ThreadLocalRandom.current().nextInt(861736, 1702875);
+//        return ThreadLocalRandom.current().nextInt(861736, 1702875);
+        // 随机861736 862735
+        return ThreadLocalRandom.current().nextInt(861736, 862735);
     }
 
     public static Integer randomNumberList() {

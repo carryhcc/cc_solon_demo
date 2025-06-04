@@ -25,7 +25,7 @@ public class PicController {
      */
     @Mapping("/picTo")
     public ModelAndView picTo() throws SQLException {
-        String url = sqlUtils.sql("SELECT pic_url FROM cc_pic_copy1 WHERE is_delete = 0 and id = " + RandomUtils.randomNumber()).queryValue();
+        String url = sqlUtils.sql("SELECT pic_url FROM cc_pic_all_dev WHERE is_delete = 0 and id = " + RandomUtils.randomNumber()).queryValue();
         return new ModelAndView("pic.ftl").put("url", url);
     }
 
@@ -37,7 +37,7 @@ public class PicController {
      */
     @Mapping("/pic")
     public String pic() throws SQLException {
-        String val = sqlUtils.sql("SELECT pic_url FROM cc_pic_all WHERE is_delete = 0 and id = " + RandomUtils.randomNumber()).queryValue();
+        String val = sqlUtils.sql("SELECT pic_url FROM cc_pic_all_dev WHERE is_delete = 0 and id = " + RandomUtils.randomNumber()).queryValue();
         return String.format(val);
     }
 
@@ -49,7 +49,7 @@ public class PicController {
      */
     @Mapping("/pic/list")
     public String picList() throws SQLException {
-        List<String> valList = sqlUtils.sql("SELECT pic_url FROM cc_pic_all WHERE is_delete = 0 and group_id = " + RandomUtils.randomNumberList()).queryRowList(String.class);
+        List<String> valList = sqlUtils.sql("SELECT pic_url FROM cc_pic_all_dev WHERE is_delete = 0 and group_id = " + RandomUtils.randomNumberList()).queryRowList(String.class);
         return String.format(String.valueOf(valList));
     }
 
