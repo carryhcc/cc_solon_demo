@@ -9,7 +9,8 @@ import org.noear.solon.core.handle.ModelAndView;
 import org.noear.solon.data.sql.SqlUtils;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class PicController {
@@ -55,10 +56,18 @@ public class PicController {
      * @throws SQLException
      */
     @Mapping("/pic/list")
-    public String picList() throws SQLException {
-        List<String> valList = sqlUtils.sql("SELECT pic_url FROM  " + sqlName + "  WHERE is_delete = 0 and group_id = " + cacheService.getRandomGroupId()).queryRowList(String.class);
-        String jsonResponse = String.valueOf(valList);
-        return StrUtils.extractPicUrls(jsonResponse);
+    public Map<String, String> picList() throws SQLException {
+        Integer randomGroupId = cacheService.getRandomGroupId();
+        String sql = "SELECT pic_name, GROUP_CONCAT(pic_url) as pic_urls " + "FROM " + sqlName + " " + "WHERE is_delete = 0 AND group_id = ? " + "GROUP BY pic_name";
+
+        return sqlUtils.sql(sql)
+                .params(randomGroupId)
+                .queryRow(resultSet -> {
+                    // 直接访问当前行，不需要调用 next()
+                    Map<String, String> map = new HashMap<>();
+                    map.put(resultSet.getString("pic_name"), "[" + resultSet.getString("pic_urls") + "]");
+                    return map;
+                });
     }
 
     @Mapping("/showPicList") // 定义访问此页面的路径
