@@ -161,7 +161,7 @@
                     <div class="ml-4 relative">
                         <button id="envSelectorBtn" class="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg transition-all duration-200">
                             <i class="fa fa-cog mr-1"></i>
-                            <span id="currentEnv">Dev</span>
+                            <span id="currentEnv">环境</span>
                             <i class="fa fa-chevron-down ml-1 text-xs"></i>
                         </button>
                         <div id="envDropdown" class="dropdown absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-dropdown z-50 overflow-hidden">
