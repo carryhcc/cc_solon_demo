@@ -85,11 +85,11 @@ public class CacheService {
     }
 
     public Integer getRandomId() {
-        return ThreadLocalRandom.current().nextInt(minId, maxId);
+        return ThreadLocalRandom.current().nextInt(minId, maxId + 1);
     }
 
     public Integer getRandomGroupId() {
-        return ThreadLocalRandom.current().nextInt(minGroupId, maxGroupId);
+        return ThreadLocalRandom.current().nextInt(minGroupId, maxGroupId + 1);
     }
 
     public void switchSqlName(String env) throws SQLException {

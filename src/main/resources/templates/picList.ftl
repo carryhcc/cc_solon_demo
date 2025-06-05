@@ -115,6 +115,13 @@
                 from { opacity: 0; }
                 to { opacity: 1; }
             }
+            .loading-indicator {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 2rem;
+                color: #165DFF;
+            }
         }
     </style>
 </head>
@@ -149,6 +156,10 @@
         <div id="imageGallery" class="image-grid fade-in">
             <!-- 图片将在这里动态加载 -->
         </div>
+
+        <div id="loadingIndicator" class="loading-indicator hidden">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+        </div>
     </main>
 
     <!-- 大图查看器 -->
@@ -175,9 +186,10 @@
         const statusMessage = document.getElementById('statusMessage');
         const galleryTitle = document.getElementById('galleryTitle');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
 
         const imageViewer = document.getElementById('imageViewer');
-        const fullSizeImage = document.getElementById('fullSizeImage');
+        const fullSizeImage = document.getElementById('fullsizeImage');
         const closeViewer = document.getElementById('closeViewer');
         const prevImage = document.getElementById('prevImage');
         const nextImage = document.getElementById('nextImage');
@@ -196,6 +208,9 @@
 
         let currentImageIndex = 0;
         let allImageUrls = [];
+        let displayedImagesCount = 0;
+        const imagesPerLoad = 5;
+        let isLoading = false;
 
         function showStatus(message, isError = false) {
             statusMessage.textContent = message;
@@ -210,6 +225,7 @@
             gallery.innerHTML = '';
             statusMessage.classList.add('hidden');
             allImageUrls = [];
+            displayedImagesCount = 0;
 
             try {
                 const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
@@ -235,56 +251,99 @@
 
                 imageUrls.forEach(url => {
                     if (url && url.trim() !== '') {
-                        const imgUrl = url.trim();
-                        allImageUrls.push(imgUrl);
-
-                        const imgContainer = document.createElement('div');
-                        imgContainer.className = 'img-container relative rounded-lg overflow-hidden shadow-card bg-white';
-
-                        const img = document.createElement('img');
-                        img.src = imgUrl;
-                        img.alt = '套图图片';
-                        img.onerror = function() {
-                            this.alt = '图片加载失败';
-                            this.classList.add('opacity-50');
-                            console.warn('图片加载失败: ' + this.src);
-                        };
-
-                        img.onload = function() {
-                            const ratio = this.naturalWidth / this.naturalHeight;
-
-                            if (ratio > 1.8) {
-                                imgContainer.classList.add('md:col-span-2');
-                            }
-                            else if (ratio < 0.6) {
-                                imgContainer.classList.add('md:row-span-2');
-                            }
-                        };
-
-                        // 创建下载按钮
-                        const downloadBtn = document.createElement('button');
-                        downloadBtn.className = 'download-btn';
-                        downloadBtn.innerHTML = '<i class="fa fa-download"></i>';
-                        downloadBtn.onclick = function(e) {
-                            e.stopPropagation(); // 防止触发图片点击事件
-                            downloadImage(imgUrl);
-                        };
-
-                        imgContainer.appendChild(img);
-                        imgContainer.appendChild(downloadBtn);
-                        gallery.appendChild(imgContainer);
-
-                        // 为图片添加点击事件
-                        imgContainer.addEventListener('click', function() {
-                            currentImageIndex = allImageUrls.indexOf(imgUrl);
-                            openImageViewer(imgUrl);
-                        });
+                        allImageUrls.push(url.trim());
                     }
                 });
+
+                if (allImageUrls.length > 0) {
+                    loadMoreImages();
+                } else {
+                    showStatus('没有有效的图片URL。');
+                }
 
             } catch (error) {
                 console.error('解析图片数据失败:', error);
                 showStatus('解析图片数据失败: ' + error.message, true);
+            }
+        }
+
+        function createImageElement(url) {
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'img-container relative rounded-lg overflow-hidden shadow-card bg-white opacity-0 transform translate-y-4 transition-all duration-500';
+
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = '套图图片';
+            img.onerror = function() {
+                this.alt = '图片加载失败';
+                this.classList.add('opacity-50');
+                console.warn('图片加载失败: ' + this.src);
+            };
+
+            img.onload = function() {
+                const ratio = this.naturalWidth / this.naturalHeight;
+
+                if (ratio > 1.8) {
+                    imgContainer.classList.add('md:col-span-2');
+                }
+                else if (ratio < 0.6) {
+                    imgContainer.classList.add('md:row-span-2');
+                }
+
+                // 添加淡入动画
+                setTimeout(() => {
+                    imgContainer.classList.remove('opacity-0', 'translate-y-4');
+                }, 50);
+            };
+
+            // 创建下载按钮
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'download-btn';
+            downloadBtn.innerHTML = '<i class="fa fa-download"></i>';
+            downloadBtn.onclick = function(e) {
+                e.stopPropagation(); // 防止触发图片点击事件
+                downloadImage(url);
+            };
+
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(downloadBtn);
+
+            // 为图片添加点击事件
+            imgContainer.addEventListener('click', function() {
+                currentImageIndex = allImageUrls.indexOf(url);
+                openImageViewer(url);
+            });
+
+            return imgContainer;
+        }
+
+        function loadMoreImages() {
+            if (isLoading || displayedImagesCount >= allImageUrls.length) return;
+
+            isLoading = true;
+            loadingIndicator.classList.remove('hidden');
+
+            const imagesToLoad = Math.min(imagesPerLoad, allImageUrls.length - displayedImagesCount);
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < imagesToLoad; i++) {
+                const imgUrl = allImageUrls[displayedImagesCount + i];
+                const imgElement = createImageElement(imgUrl);
+                fragment.appendChild(imgElement);
+            }
+
+            gallery.appendChild(fragment);
+            displayedImagesCount += imagesToLoad;
+
+            // 检查是否已加载全部图片
+            if (displayedImagesCount >= allImageUrls.length) {
+                setTimeout(() => {
+                    isLoading = false;
+                    loadingIndicator.classList.add('hidden');
+                }, 500);
+            } else {
+                isLoading = false;
+                loadingIndicator.classList.add('hidden');
             }
         }
 
@@ -392,6 +451,18 @@
             const menuItems = document.querySelector('.flex.items-center.space-x-4');
             menuItems.classList.toggle('hidden');
             menuItems.classList.toggle('flex');
+        });
+
+        // 滚动加载更多图片
+        window.addEventListener('scroll', () => {
+            if (isLoading) return;
+
+            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+            // 当滚动到距离底部100px时加载更多图片
+            if (scrollTop + clientHeight >= scrollHeight - 100) {
+                loadMoreImages();
+            }
         });
     });
 </script>
