@@ -1,6 +1,7 @@
 package com.example.demo.server;
 
 import com.example.demo.utils.ResettableTimer;
+import com.example.demo.utils.StrUtils;
 import lombok.Getter;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Init;
@@ -39,9 +40,16 @@ public class CacheService {
     public static String sqlName = "cc_pic_all_dev";
 
 
-    @Getter
     @Inject("${config.env}")
     public static String defaultEnv;
+
+    public String getDefaultEnv() {
+        // 设置默认值
+        if (StrUtils.isEmpty(defaultEnv)) {
+            defaultEnv = "dev";
+        }
+        return defaultEnv;
+    }
 
     public static final List<String> defaultList = Arrays.asList(
             "cc_pic_all_dev", "cc_pic_all_test", "cc_pic_all_prod"
