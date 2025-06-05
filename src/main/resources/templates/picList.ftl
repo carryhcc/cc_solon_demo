@@ -131,9 +131,16 @@
     <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm shadow-header transition-all duration-300">
         <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center justify-between">
             <div class="flex items-center justify-between mb-3 md:mb-0">
-                <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary">
-                    <i class="fa fa-images mr-2"></i>精选套图
-                </h1>
+                <div class="flex items-center">
+                    <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary">
+                        <i class="fa fa-images mr-2"></i>套图
+                    </h1>
+                    <div class="ml-4 flex space-x-2">
+                        <button class="env-btn bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium px-2.5 py-1 rounded transition-all duration-200" data-env="dev">Dev</button>
+                        <button class="env-btn bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium px-2.5 py-1 rounded transition-all duration-200" data-env="test">Test</button>
+                        <button class="env-btn bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium px-2.5 py-1 rounded transition-all duration-200" data-env="prod">Prod</button>
+                    </div>
+                </div>
                 <button id="mobileMenuBtn" class="md:hidden text-neutral-500 focus:outline-none">
                     <i class="fa fa-bars text-xl"></i>
                 </button>
@@ -187,6 +194,7 @@
         const galleryTitle = document.getElementById('galleryTitle');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const loadingIndicator = document.getElementById('loadingIndicator');
+        const envButtons = document.querySelectorAll('.env-btn');
 
         const imageViewer = document.getElementById('imageViewer');
         const fullSizeImage = document.getElementById('fullsizeImage');
@@ -269,7 +277,7 @@
 
         function createImageElement(url) {
             const imgContainer = document.createElement('div');
-            imgContainer.className = 'img-container relative rounded-lg overflow-hidden shadow-card bg-white opacity-0 transform translate-y-4 transition-all duration-500';
+            imgContainer.className = 'img-container relative rounded-lg overflow-hidden shadow-card bg-white opacity-0 transform shadow-card bg-white opacity-0 transform translate-y-4 transition-all duration-500';
 
             const img = document.createElement('img');
             img.src = url;
@@ -387,6 +395,16 @@
 
         refreshButton.addEventListener('click', fetchAndDisplayImages);
         fetchAndDisplayImages();
+
+        envButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const env = this.dataset.env;
+                // window.location.href = '/' + env
+                fetch('/' + env).then(() => {
+                    fetchAndDisplayImages()
+                })
+            });
+        });
 
         function openImageViewer(imgUrl) {
             fullSizeImage.src = imgUrl;

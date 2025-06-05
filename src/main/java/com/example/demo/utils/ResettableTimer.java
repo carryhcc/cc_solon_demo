@@ -25,9 +25,9 @@ public class ResettableTimer implements AutoCloseable {
     public ResettableTimer(CacheService cacheService, long delayMinutes, String targetEnv) {
         this.cacheService = cacheService;
         // 将分钟转换为毫秒，修正了原始代码中的乘数
-//        this.delayMillis = delayMinutes * 60 * 1000;
+        this.delayMillis = delayMinutes * 60 * 1000;
         // 如果需要秒级切换，可以使用：
-         this.delayMillis = delayMinutes * 2000;
+        // this.delayMillis = delayMinutes * 1000;
         this.targetEnv = targetEnv;
         // 创建单线程的 ScheduledExecutorService，并自定义线程工厂来命名线程
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
