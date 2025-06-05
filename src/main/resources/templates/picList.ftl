@@ -177,7 +177,7 @@
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
         const imageViewer = document.getElementById('imageViewer');
-        const fullsizeImage = document.getElementById('fullsizeImage');
+        const fullSizeImage = document.getElementById('fullSizeImage');
         const closeViewer = document.getElementById('closeViewer');
         const prevImage = document.getElementById('prevImage');
         const nextImage = document.getElementById('nextImage');
@@ -330,7 +330,7 @@
         fetchAndDisplayImages();
 
         function openImageViewer(imgUrl) {
-            fullsizeImage.src = imgUrl;
+            fullSizeImage.src = imgUrl;
             imageViewer.classList.add('active');
             document.body.style.overflow = 'hidden';
             updateNavButtons();
@@ -354,14 +354,14 @@
         function showPreviousImage() {
             if (allImageUrls.length > 0) {
                 currentImageIndex = (currentImageIndex - 1 + allImageUrls.length) % allImageUrls.length;
-                fullsizeImage.src = allImageUrls[currentImageIndex];
+                fullSizeImage.src = allImageUrls[currentImageIndex];
             }
         }
 
         function showNextImage() {
             if (allImageUrls.length > 0) {
                 currentImageIndex = (currentImageIndex + 1) % allImageUrls.length;
-                fullsizeImage.src = allImageUrls[currentImageIndex];
+                fullSizeImage.src = allImageUrls[currentImageIndex];
             }
         }
 

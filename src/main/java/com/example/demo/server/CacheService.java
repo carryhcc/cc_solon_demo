@@ -5,19 +5,23 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Init;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.data.sql.SqlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class CacheService {
 
+    private static final Logger log = LoggerFactory.getLogger(CacheService.class);
     @Getter
     public Integer maxId;
 
     @Getter
     public Integer minId;
-
 
     @Getter
     public Integer maxGroupId;
@@ -28,8 +32,10 @@ public class CacheService {
     @Inject
     SqlUtils sqlUtils;
 
-    @Inject("${config.sqlName}")
-    public static String sqlName;
+    // 默认测试库
+    public static String sqlName = "cc_pic_all_dev";
+
+    public static final List<String> defaultList = Arrays.asList("cc_pic_all_dev", "cc_pic_all_test", "cc_pic_all_prod");
 
     @Init
     public void cachePicId() throws SQLException {
@@ -57,5 +63,21 @@ public class CacheService {
         return ThreadLocalRandom.current().nextInt(minGroupId, maxGroupId);
     }
 
+    public String getSqlName() {
+        return sqlName;
+    }
 
+    public void switchSqlName(String env) throws SQLException {
+        // 切换库
+        String newSqlName = "cc_pic_all_" + env;
+        // 判断是否正常
+        if (!defaultList.contains(sqlName)) {
+            log.error("切换异常:{}", sqlName);
+        }
+        sqlName = newSqlName;
+        log.warn("切换成功:{}", sqlName);
+        // 刷新缓存
+        this.cachePicId();
+    }
+    // 10分钟恢复默认库
 }

@@ -1,27 +1,24 @@
 package com.example.demo;
 
 import com.example.demo.server.CacheService;
-import org.noear.solon.annotation.Controller;
-import org.noear.solon.annotation.Inject;
-import org.noear.solon.annotation.Mapping;
+import org.noear.solon.annotation.*;
 import org.noear.solon.core.handle.ModelAndView;
 import org.noear.solon.data.sql.SqlUtils;
 
 import java.sql.SQLException;
 import java.util.*;
 
+import static com.example.demo.server.CacheService.sqlName;
+
 @Controller
 public class PicController {
 
 
     @Inject
-    SqlUtils sqlUtils;
-
-    @Inject("${config.sqlName}")
-    public static String sqlName;
+    CacheService cacheService;
 
     @Inject
-    CacheService cacheService;
+    SqlUtils sqlUtils;
 
     /**
      * 跳转网页
@@ -31,6 +28,7 @@ public class PicController {
      */
     @Mapping("/showPic")
     public ModelAndView picTo() throws SQLException {
+
         String url = sqlUtils.sql("SELECT pic_url FROM  " + sqlName + "  WHERE is_delete = 0 and id = " + cacheService.getRandomId()).queryValue();
         return new ModelAndView("pic.ftl").put("url", url);
     }
@@ -70,7 +68,7 @@ public class PicController {
                 });
     }
 
-    @Mapping("/showPicList") // 定义访问此页面的路径
+    @Mapping("/showPicList")
     public ModelAndView showPicListPage() {
         return new ModelAndView("picList.ftl");
     }
