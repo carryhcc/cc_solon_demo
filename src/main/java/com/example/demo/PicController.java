@@ -1,7 +1,6 @@
 package com.example.demo;
 
 import com.example.demo.server.CacheService;
-import com.example.demo.utils.StrUtils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
@@ -61,8 +60,6 @@ public class PicController {
         sqlUtils.sql("SET SESSION group_concat_max_len = 1024000;").update();
         // 再执行查询语句
         String sql = "SELECT pic_name, GROUP_CONCAT(pic_url) as pic_urls " + "FROM " + sqlName + " " + "WHERE is_delete = 0 AND group_id = ? " + "GROUP BY pic_name";
-
-        System.out.println("sql:" + sql);
 
         return sqlUtils.sql(sql)
                 .params(randomGroupId)
