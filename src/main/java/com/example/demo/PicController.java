@@ -53,6 +53,7 @@ public class PicController {
      */
     @Mapping("/pic/list")
     public Map<String, String> picList() throws SQLException {
+        cacheService.resetTimer();
         Integer randomGroupId = cacheService.getRandomGroupId();
         // 先设置会话变量
         sqlUtils.sql("SET SESSION group_concat_max_len = 1024000;").update();
