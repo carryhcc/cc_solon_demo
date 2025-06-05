@@ -1,4 +1,4 @@
-server.port: 8080
+server.port: 8086
 
 solon.app:
   name: 'demo-app'
@@ -14,7 +14,9 @@ solon.logging:
 solon.dataSources:
   db_order!: #数据源命名，且加类型注册（即默认）
     class: "com.zaxxer.hikari.HikariDataSource" #数据源类
-    jdbcUrl: "jdbc:mysql://111.111.111.111:23306/testPic?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true"
-    driverClassName: "com.mysql.jdbc.Driver"
+    jdbcUrl: "jdbc:mysql://111.111.111.111:3306/testPic?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true&useSSL=false"
+    driverClassName: "com.mysql.cj.jdbc.Driver"
     username: "root"
     password: "root"
+
+config.env: "dev"
