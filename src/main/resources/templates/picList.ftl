@@ -30,6 +30,7 @@
                     boxShadow: {
                         'card': '0 4px 20px rgba(0, 0, 0, 0.08)',
                         'header': '0 2px 10px rgba(0, 0, 0, 0.05)',
+                        'dropdown': '0 4px 12px rgba(0, 0, 0, 0.15)',
                     }
                 },
             }
@@ -122,6 +123,27 @@
                 padding: 2rem;
                 color: #165DFF;
             }
+            .dropdown {
+                transform-origin: top right;
+                transform: scale(0);
+                opacity: 0;
+                transition: transform 0.2s ease, opacity 0.2s ease;
+            }
+            .dropdown.active {
+                transform: scale(1);
+                opacity: 1;
+            }
+            .env-item {
+                transition: all 0.2s ease;
+            }
+            .env-item:hover {
+                background-color: rgba(22, 93, 255, 0.1);
+            }
+            .env-item.active {
+                background-color: rgba(22, 93, 255, 0.15);
+                color: #165DFF;
+                font-weight: 500;
+            }
         }
     </style>
 </head>
@@ -135,10 +157,24 @@
                     <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary">
                         <i class="fa fa-images mr-2"></i>套图
                     </h1>
-                    <div class="ml-4 flex space-x-2">
-                        <button class="env-btn bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium px-2.5 py-1 rounded transition-all duration-200" data-env="dev">Dev</button>
-                        <button class="env-btn bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium px-2.5 py-1 rounded transition-all duration-200" data-env="test">Test</button>
-                        <button class="env-btn bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium px-2.5 py-1 rounded transition-all duration-200" data-env="prod">Prod</button>
+                    <!-- 环境选择下拉菜单 -->
+                    <div class="ml-4 relative">
+                        <button id="envSelectorBtn" class="flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg transition-all duration-200">
+                            <i class="fa fa-cog mr-1"></i>
+                            <span id="currentEnv">Dev</span>
+                            <i class="fa fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div id="envDropdown" class="dropdown absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-dropdown z-50 overflow-hidden">
+                            <div class="env-item active px-4 py-2 cursor-pointer flex items-center" data-env="dev">
+                                <i class="fa fa-check-circle mr-2 text-primary"></i>开发环境
+                            </div>
+                            <div class="env-item px-4 py-2 cursor-pointer flex items-center" data-env="test">
+                                <i class="fa fa-circle-o mr-2 text-gray-400"></i>测试环境
+                            </div>
+                            <div class="env-item px-4 py-2 cursor-pointer flex items-center" data-env="prod">
+                                <i class="fa fa-circle-o mr-2 text-gray-400"></i>生产环境
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <button id="mobileMenuBtn" class="md:hidden text-neutral-500 focus:outline-none">
@@ -194,7 +230,12 @@
         const galleryTitle = document.getElementById('galleryTitle');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const loadingIndicator = document.getElementById('loadingIndicator');
-        const envButtons = document.querySelectorAll('.env-btn');
+
+        // 环境选择相关元素
+        const envSelectorBtn = document.getElementById('envSelectorBtn');
+        const envDropdown = document.getElementById('envDropdown');
+        const envItems = document.querySelectorAll('.env-item');
+        const currentEnvDisplay = document.getElementById('currentEnv');
 
         const imageViewer = document.getElementById('imageViewer');
         const fullSizeImage = document.getElementById('fullsizeImage');
@@ -219,6 +260,7 @@
         let displayedImagesCount = 0;
         const imagesPerLoad = 5;
         let isLoading = false;
+        let currentEnv = 'dev';
 
         function showStatus(message, isError = false) {
             statusMessage.textContent = message;
@@ -396,14 +438,44 @@
         refreshButton.addEventListener('click', fetchAndDisplayImages);
         fetchAndDisplayImages();
 
-        envButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
+        // 环境选择器逻辑
+        envSelectorBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            envDropdown.classList.toggle('active');
+        });
+
+        envItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
                 const env = this.dataset.env;
-                // window.location.href = '/' + env
-                fetch('/' + env).then(() => {
-                    fetchAndDisplayImages()
-                })
+
+                if (env !== currentEnv) {
+                    // 更新UI
+                    envItems.forEach(i => {
+                        i.classList.remove('active');
+                        i.querySelector('i').className = 'fa fa-circle-o mr-2 text-gray-400';
+                    });
+                    this.classList.add('active');
+                    this.querySelector('i').className = 'fa fa-check-circle mr-2 text-primary';
+                    currentEnvDisplay.textContent = env === 'dev' ? '开发' : env === 'test' ? '测试' : '生产';
+
+                    // 更新环境
+                    currentEnv = env;
+
+                    // 调用环境切换逻辑
+                    fetch('/' + env).then(() => {
+                        fetchAndDisplayImages();
+                    });
+                }
+
+                // 关闭下拉菜单
+                envDropdown.classList.remove('active');
             });
+        });
+
+        // 点击页面其他区域关闭下拉菜单
+        document.addEventListener('click', function() {
+            envDropdown.classList.remove('active');
         });
 
         function openImageViewer(imgUrl) {
