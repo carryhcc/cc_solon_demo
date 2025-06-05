@@ -36,7 +36,7 @@ public class ResettableTimer {
                 try {
                     // 如果是dev环境，直接返回不执行切换
                     if (cacheService.getDefaultEnv().equalsIgnoreCase(targetEnv)) {
-                        log.info("当前为开发环境{}，跳过环境切换任务",targetEnv);
+                        log.info("当前为开发环境:{}，跳过环境切换任务",targetEnv);
                         return;
                     }
 
@@ -56,7 +56,6 @@ public class ResettableTimer {
             timer = new Timer();
             scheduleTask();
 
-            // 使用工具方法生成时间描述并记录日志
             log.info("定时器已重置，{}后切换到{}环境", formatDelayTime(delayMillis), targetEnv);
         } catch (Exception e) {
             log.error("重置定时器失败", e);

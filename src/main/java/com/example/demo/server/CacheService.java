@@ -2,7 +2,6 @@ package com.example.demo.server;
 
 import com.example.demo.utils.ResettableTimer;
 import lombok.Getter;
-import lombok.Value;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Init;
 import org.noear.solon.annotation.Inject;
@@ -39,6 +38,11 @@ public class CacheService {
 
     public static String sqlName = "cc_pic_all_dev";
 
+
+    @Getter
+    @Inject("${config.env}")
+    public static String defaultEnv;
+
     public static final List<String> defaultList = Arrays.asList(
             "cc_pic_all_dev", "cc_pic_all_test", "cc_pic_all_prod"
     );
@@ -48,14 +52,7 @@ public class CacheService {
     }
 
     private void initTimer() {
-        this.resettableTimer = new ResettableTimer(this, 10, "dev");
-    }
-
-    @Inject("${config.env}")
-    public static String defaultEnv;
-
-    public String getDefaultEnv() {
-        return defaultEnv;
+        this.resettableTimer = new ResettableTimer(this, 5, "dev");
     }
 
     @Init
@@ -100,13 +97,14 @@ public class CacheService {
         sqlName = newSqlName;
 
         defaultEnv = env;
+
         log.info("切换成功:{}", sqlName);
 
         // 刷新缓存
         this.cachePicId();
 
         // 刷新定时器
-        resettableTimer.reset();
+        this.resetTimer();
     }
 
     public void resetTimer() {
