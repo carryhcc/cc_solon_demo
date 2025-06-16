@@ -1,0 +1,6 @@
+db:
+  host: 111.111.111.111
+  port: 3306
+  name: test
+  user: root
+  password: root
