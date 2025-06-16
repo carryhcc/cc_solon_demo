@@ -15,3 +15,10 @@ solon.logging:
     file:
       level: INFO
 config.env: "dev"
+
+solon.dataSources:
+  db_order!:
+    class: "com.zaxxer.hikari.HikariDataSource"
+    jdbcUrl: "jdbc:mysql://${db.host}:${db.port}/${db.name}?useUnicode=true&characterEncoding=utf8"
+    username: "${db.user}"
+    password: "${db.password}"

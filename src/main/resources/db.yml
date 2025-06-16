@@ -1,7 +1,0 @@
-solon.dataSources:
-  db_order!:
-    class: "com.zaxxer.hikari.HikariDataSource"
-    jdbcUrl: "jdbc:mysql://111.111.111.111:3306/test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true&useSSL=false"
-    driverClassName: "com.mysql.cj.jdbc.Driver"
-    username: "root"
-    password: "root"
